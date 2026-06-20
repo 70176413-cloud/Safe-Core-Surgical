@@ -1,0 +1,6 @@
+{
+  "name": "Safe Core Surgical",
+  "description": "Precision-engineered surgical storefront for clinical teams and elite surgical programs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
