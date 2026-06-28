@@ -25,7 +25,9 @@ import {
   Sparkles,
   Printer,
   ChevronDown,
-  Info
+  Info,
+  Heart,
+  Eye
 } from "lucide-react";
 
 import { SurgicalCategory, SurgicalInstrument, QuoteItem, QuoteRequest } from "./types";
@@ -134,6 +136,11 @@ export default function App() {
     form: QuoteRequest;
   } | null>(null);
 
+  // Email dispatch status states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [submissionSuccessUrl, setSubmissionSuccessUrl] = useState<string | null>(null);
+
   // Filtered surgical instruments
   const filteredInstruments = useMemo(() => {
     return SURGICAL_INSTRUMENTS.filter(inst => {
@@ -161,6 +168,39 @@ export default function App() {
       case "Cpu": return <Cpu className="w-5 h-5" />;
       case "GitCommit": return <GitCommit className="w-5 h-5" />;
       default: return <ShieldCheck className="w-5 h-5" />;
+    }
+  };
+
+  const getIconForCategory = (category: SurgicalCategory) => {
+    switch (category) {
+      case SurgicalCategory.GENERAL:
+        return <Scissors className="w-5 h-5" />;
+      case SurgicalCategory.ORTHOPEDIC:
+        return <Hammer className="w-5 h-5" />;
+      case SurgicalCategory.ENT:
+        return <Activity className="w-5 h-5" />;
+      case SurgicalCategory.GYNECOLOGY:
+        return <Layers className="w-5 h-5" />;
+      case SurgicalCategory.DENTAL:
+        return <Wrench className="w-5 h-5" />;
+      case SurgicalCategory.OPHTHALMIC:
+        return <Compass className="w-5 h-5" />;
+      case SurgicalCategory.CARDIOVASCULAR:
+        return <Heart className="w-5 h-5" />;
+      case SurgicalCategory.NEUROSURGERY:
+        return <Cpu className="w-5 h-5" />;
+      case SurgicalCategory.UROLOGY:
+        return <ShieldCheck className="w-5 h-5" />;
+      case SurgicalCategory.PLASTIC:
+        return <Sparkles className="w-5 h-5" />;
+      case SurgicalCategory.LAPAROSCOPIC:
+        return <Maximize2 className="w-5 h-5" />;
+      case SurgicalCategory.THORACIC:
+        return <GitCommit className="w-5 h-5" />;
+      case SurgicalCategory.OPERATING_ROOM:
+        return <Layers className="w-5 h-5" />;
+      default:
+        return <ShieldCheck className="w-5 h-5" />;
     }
   };
 
@@ -207,24 +247,78 @@ export default function App() {
   }, [quoteCart]);
 
   // Handle Form Submission
-  const handleQuoteSubmit = (e: React.FormEvent) => {
+  const handleQuoteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (quoteCart.length === 0) return;
 
+    setIsSubmitting(true);
+    setSubmissionError(null);
+    setSubmissionSuccessUrl(null);
+
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const generatedRef = `SC-${formData.organization.slice(0, 3).toUpperCase()}-${randomSuffix}`;
+    const orgPrefix = formData.organization ? formData.organization.replace(/[^a-zA-Z]/g, "").slice(0, 3).toUpperCase() : "REQ";
+    const generatedRef = `SC-${orgPrefix}-${randomSuffix}`;
     const currentDate = new Date().toISOString().split('T')[0];
 
-    setSubmittedQuoteRef({
-      refId: generatedRef,
-      date: currentDate,
-      items: [...quoteCart],
-      form: { ...formData }
-    });
+    try {
+      const response = await fetch("/api/send-inquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          organization: formData.organization,
+          email: formData.email,
+          phone: formData.phone,
+          tier: formData.tier,
+          notes: formData.notes,
+          items: quoteCart,
+          totalEstimated: totalVolumeEst,
+          refId: generatedRef,
+          date: currentDate,
+        }),
+      });
 
-    // Clean cart and close drawer
-    setQuoteCart([]);
-    setIsQuoteDrawerOpen(false);
+      if (!response.ok) {
+        throw new Error("SMTP dispatch or requisition verification failed.");
+      }
+
+      const result = await response.json();
+      console.log("Requisition email dispatched successfully:", result);
+
+      if (result.testPreviewUrl) {
+        setSubmissionSuccessUrl(result.testPreviewUrl);
+      }
+
+      setSubmittedQuoteRef({
+        refId: generatedRef,
+        date: currentDate,
+        items: [...quoteCart],
+        form: { ...formData }
+      });
+
+      // Clear cart and close drawer
+      setQuoteCart([]);
+      setIsQuoteDrawerOpen(false);
+    } catch (err: any) {
+      console.error("Requisition transmission failure:", err);
+      setSubmissionError(err.message || "Failed to contact SMTP backend. Requisition generated offline.");
+      
+      // Fallback: still show the document sheet to the client so they are never blocked
+      setSubmittedQuoteRef({
+        refId: generatedRef,
+        date: currentDate,
+        items: [...quoteCart],
+        form: { ...formData }
+      });
+
+      // Clear cart and close drawer
+      setQuoteCart([]);
+      setIsQuoteDrawerOpen(false);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Helper to scroll smoothly to sections
@@ -268,10 +362,10 @@ export default function App() {
           </h1>
         </div>
 
-        {/* Home link on Left for extra balance, or empty left block with absolute right pinning */}
-        <div className="hidden md:flex items-center space-x-4 text-xs font-mono text-zinc-500">
-          <span className="h-2 w-2 rounded-full bg-maroon animate-pulse"></span>
-          <span>SYSTEM ONLINE (v2.6)</span>
+        {/* Certification Indicator */}
+        <div className="hidden md:flex items-center space-x-2.5 text-xs font-mono text-zinc-400">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>ISO 13485 CERTIFIED MFG</span>
         </div>
 
         {/* Utility Menu Links (Far Right End) */}
@@ -384,6 +478,82 @@ export default function App() {
         <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-matt-black to-transparent pointer-events-none"></div>
       </section>
 
+      {/* SPECIALIZED CATEGORY DIRECTORY GRID */}
+      {activeCategory === "All" && (
+        <section id="disciplines-directory" className="bg-zinc-950/45 border-b border-zinc-900/60 py-20 px-6 sm:px-10">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <span className="text-xs font-bold tracking-[0.2em] text-maroon uppercase block mb-3">ANATOMICAL PORTFOLIO</span>
+              <h3 className="editorial-serif font-normal text-3xl md:text-5xl text-white">
+                Surgical Specialization Catalog
+              </h3>
+              <p className="text-sm text-zinc-400 mt-3 max-w-xl mx-auto font-light leading-relaxed">
+                Click any surgical discipline below to filter our master inventory and inspect specialized, medical-grade stainless steel instruments.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {Object.entries(CATEGORY_DETAILS).map(([catKey, detail]) => {
+                const category = catKey as SurgicalCategory;
+                return (
+                  <div
+                    key={catKey}
+                    onClick={() => {
+                      setActiveCategory(category);
+                      scrollToSection("products");
+                    }}
+                    className="group bg-zinc-900/15 hover:bg-zinc-900/50 border border-zinc-900 hover:border-maroon/40 rounded p-6 cursor-pointer transition-all duration-300 flex flex-col justify-between hover:shadow-xl hover:-translate-y-1"
+                  >
+                    <div>
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="w-10 h-10 rounded bg-zinc-950 border border-zinc-850 flex items-center justify-center text-maroon group-hover:bg-maroon group-hover:text-white transition-all duration-300">
+                          {getIconForCategory(category)}
+                        </div>
+                        <span className="font-mono text-zinc-750 text-[10px] group-hover:text-maroon font-bold transition-colors">
+                          SEC-{detail.numberLabel}
+                        </span>
+                      </div>
+                      <h4 className="editorial-serif text-lg text-white font-medium group-hover:text-maroon transition-colors mb-2">
+                        {category}
+                      </h4>
+                      <p className="text-xs text-zinc-400 leading-relaxed font-light line-clamp-3 mb-4">
+                        {detail.tooltip}
+                      </p>
+                    </div>
+                    <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500 pt-4 border-t border-zinc-900/60 group-hover:text-zinc-350 transition-colors">
+                      <span>{detail.count} INSTRUMENTS</span>
+                      <span className="flex items-center gap-1 text-maroon font-bold group-hover:translate-x-1 transition-transform">
+                        <span>VIEW ALL</span>
+                        <ChevronRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* DISCIPLINE BREADCRUMB RETURN NAVIGATION */}
+      {activeCategory !== "All" && (
+        <div className="bg-zinc-950/25 py-4 px-6 sm:px-10 border-b border-zinc-900">
+          <div className="max-w-7xl mx-auto flex items-center justify-between text-xs font-mono">
+            <div className="flex items-center space-x-2 text-zinc-400">
+              <span className="hover:text-zinc-350 cursor-pointer" onClick={() => setActiveCategory("All")}>Home</span>
+              <span className="text-zinc-650">/</span>
+              <span className="text-maroon font-bold uppercase tracking-wider">{activeCategory}</span>
+            </div>
+            <button
+              onClick={() => setActiveCategory("All")}
+              className="text-maroon hover:text-white hover:underline uppercase tracking-widest font-bold flex items-center gap-1 transition-colors cursor-pointer"
+            >
+              <span>← Back to Specializations Directory</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 4. SPECIALIZED HORIZONTAL CATEGORY STRIP */}
       <div className="bg-zinc-950/80 backdrop-blur-md py-4 border-y border-zinc-900 sticky top-0 md:top-20 z-30 shadow-2xl overflow-x-auto scrollbar-none">
         <div className="max-w-7xl mx-auto px-6 sm:px-10 flex items-center gap-2 md:gap-4 whitespace-nowrap min-w-max">
@@ -471,10 +641,10 @@ export default function App() {
                 <ShieldCheck className="w-8 h-8" />
               </div>
               <h3 className="editorial-serif italic text-2xl md:text-3xl font-normal text-zincCharcoal">
-                Verification Reference Generated
+                Requisition Request Submitted
               </h3>
               <p className="text-xs text-zinc-500 uppercase tracking-widest font-mono mt-2">
-                STATUS: APPROVED CLINICAL RECORD
+                STATUS: RECEIVED FOR REVIEW
               </p>
             </div>
 
@@ -494,7 +664,7 @@ export default function App() {
                   </h4>
                   <p className="text-[10px] text-zinc-500">ISO 13485 CERTIFIED CLINICAL MFG</p>
                   <p className="text-[10px] text-zinc-500 flex items-center gap-1 mt-1">
-                    <span>SYS_REF_ID:</span>
+                    <span>REQUISITION NO:</span>
                     <span className="font-bold text-zinc-800">{submittedQuoteRef.refId}</span>
                   </p>
                 </div>
@@ -566,6 +736,38 @@ export default function App() {
                 </div>
               )}
             </div>
+
+            {submissionSuccessUrl && (
+              <div className="mt-6 p-4 bg-emerald-50 border border-emerald-250 text-emerald-800 text-xs rounded-sm flex items-start gap-3 shadow-sm">
+                <span className="text-base text-emerald-600">✉</span>
+                <div>
+                  <p className="font-extrabold uppercase tracking-wider text-[10px] text-emerald-950 font-mono">Active Email Delivery Verified</p>
+                  <p className="mt-1 text-emerald-900 leading-relaxed">
+                    Your requisition was successfully delivered to <strong className="font-semibold">sales@safecoresurgical.com</strong>. Since this is the AI Studio preview environment, you can inspect the exact outbound corporate email layout online:
+                  </p>
+                  <a 
+                    href={submissionSuccessUrl} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="mt-2.5 inline-flex items-center gap-1 bg-emerald-800 text-white font-bold px-4.5 py-2 rounded hover:bg-emerald-900 transition-colors uppercase tracking-widest text-[10px] shadow-sm cursor-pointer font-mono"
+                  >
+                    <span>View Sent Email Preview ↗</span>
+                  </a>
+                </div>
+              </div>
+            )}
+
+            {submissionError && (
+              <div className="mt-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-sm flex items-start gap-3">
+                <span className="text-base text-amber-600">⚠</span>
+                <div>
+                  <p className="font-bold uppercase tracking-wider text-[10px] text-amber-950 font-mono">Local Requisition Completed</p>
+                  <p className="mt-1 text-amber-900 leading-relaxed">
+                    Requisition sheet generated locally. The live SMTP mailserver is currently unconfigured or unreachable ({submissionError}). Real inquiries will be dispatched to sales@safecoresurgical.com once SMTP keys are set in your environment settings.
+                  </p>
+                </div>
+              </div>
+            )}
 
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-zinc-500 flex items-center gap-1.5">
@@ -1001,9 +1203,14 @@ export default function App() {
                 <button 
                   type="submit"
                   form="quote-submission-form"
-                  className="w-full px-8 py-3.5 bg-maroon text-white font-medium hover:bg-maroon-hover transition-colors duration-300 shadow-lg tracking-wide uppercase text-xs cursor-pointer block text-center rounded"
+                  disabled={isSubmitting}
+                  className={`w-full px-8 py-3.5 text-white font-medium transition-all duration-300 shadow-lg tracking-wide uppercase text-xs rounded text-center block ${
+                    isSubmitting 
+                      ? "bg-maroon/50 cursor-wait pointer-events-none" 
+                      : "bg-maroon hover:bg-maroon-hover cursor-pointer"
+                  }`}
                 >
-                  Generate Official Sourcing Sheet
+                  {isSubmitting ? "Transmitting Requisition..." : "Submit Requisition & Generate Sheet"}
                 </button>
               ) : (
                 <button 
@@ -1081,29 +1288,26 @@ export default function App() {
             </div>
 
             {/* B. Right Display Column & Trust Badge */}
-            <div className="relative w-full h-[450px] lg:h-auto min-h-[400px] bg-zinc-900 rounded border border-zinc-850 overflow-hidden flex items-center justify-center shadow-md">
-              {/* Specialty manufacturing display placeholder backdrop */}
-              <div className="absolute inset-0 bg-gradient-to-tr from-zinc-950 to-zinc-900 flex flex-col justify-between p-8 select-none">
-                <div className="flex justify-between border-b border-zinc-800 pb-2">
-                  <span className="text-[10px] font-mono tracking-widest text-zinc-500">SYS_REF: IND-9011X</span>
-                  <span className="text-[10px] font-mono tracking-widest text-zinc-500">ISO 13485 CERTIFIED</span>
-                </div>
-                
-                {/* Decorative high-performance blueprint geometry inside placeholder */}
-                <div className="flex items-center justify-center py-6 opacity-35">
-                  <svg className="w-40 h-40 text-zinc-750" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="9" strokeWidth="0.75" strokeDasharray="4 4"></circle>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="0.75" d="M12 4v16m8-8H4M6 6l12 12m0-12L6 18"></path>
-                  </svg>
-                </div>
-                
-                <div className="text-right text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
-                  [ Specialty Manufacturing Close-up Canvas ]
-                </div>
+            <div className="relative w-full h-[450px] lg:h-auto min-h-[400px] bg-zinc-950 rounded border border-zinc-900 overflow-hidden shadow-2xl group/img">
+              {/* High-class surgical instruments image */}
+              <img 
+                src="/src/assets/images/surgical_precision_mfg_1782468821414.jpg" 
+                alt="Surgical Precision Manufacturing" 
+                referrerPolicy="no-referrer"
+                className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover/img:scale-105 transition-transform duration-700 ease-out"
+              />
+              
+              {/* Elegant dark gradient overlay for visual contrast */}
+              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent z-10"></div>
+              
+              {/* Overlay regulatory metrics */}
+              <div className="absolute top-0 left-0 right-0 p-8 flex justify-between items-center z-20 select-none">
+                <span className="text-[10px] font-mono tracking-widest text-white/70 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-sm border border-zinc-800/40">SEC-REF: CLN-402X</span>
+                <span className="text-[10px] font-mono tracking-widest text-maroon font-extrabold bg-maroon/10 backdrop-blur-md px-2.5 py-1 rounded-sm border border-maroon/30">ISO 13485</span>
               </div>
 
-              {/* Trust Badge (locked explicitly to the bottom-left corner of the container) */}
-              <div className="absolute bottom-0 left-0 bg-maroon text-white p-8 max-w-[260px] shadow-2xl z-20">
+              {/* Trust Badge (locked explicitly to the bottom-right/left corner of the container) */}
+              <div className="absolute bottom-0 left-0 bg-maroon/95 backdrop-blur-md text-white p-8 max-w-[260px] shadow-2xl z-20 border-r border-t border-maroon-hover">
                 {/* Massive classic type numeral "15+" */}
                 <span className="editorial-serif block text-6xl font-bold leading-none mb-2">
                   15+
