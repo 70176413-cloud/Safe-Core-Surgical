@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+export type NavigationTab = "home" | "products" | "custom" | "about" | "quality" | "contact";
+
 export enum SurgicalCategory {
   GENERAL = "General Surgery",
   ORTHOPEDIC = "Orthopedic Surgery",
@@ -44,4 +46,29 @@ export interface QuoteRequest {
   phone: string;
   tier: "Standard Clinical" | "Elite Hospital System" | "Global Distributor";
   notes: string;
+}
+
+export interface CustomOrderRequest {
+  fullName: string;
+  organization: string;
+  email: string;
+  phone: string;
+  category: string;
+  instrumentType: string;
+  alloy: string;
+  jawType: string;
+  finish: string;
+  lengthMm: number;
+  laserEtchingText: string;
+  quantityTier: string;
+  notes: string;
+  hasAttachment: boolean;
+  attachmentFileName?: string;
+}
+
+export interface SubmittedQuoteRef {
+  refId: string;
+  date: string;
+  items: QuoteItem[];
+  form: QuoteRequest;
 }
