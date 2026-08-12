@@ -34,14 +34,14 @@ export const AboutPage: React.FC<AboutPageProps> = ({ setActiveTab, setIsCartOpe
               <div className="relative rounded overflow-hidden border border-slate-200 shadow-xl">
                 <img 
                   src="/src/assets/images/ceo_abdul_ul_rehman.jpg" 
-                  alt="Chief Executive Officer Abdul Ul Rehman" 
+                  alt="Chief Executive Officer Abdul Rehman" 
                   referrerPolicy="no-referrer"
                   className="w-full h-[480px] object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent"></div>
                 
                 <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/95 backdrop-blur-md border border-slate-200 rounded shadow-md">
-                  <h3 className="editorial-serif text-slate-900 font-bold text-lg">Abdul Ul Rehman</h3>
+                  <h3 className="editorial-serif text-slate-900 font-bold text-lg">Abdul Rehman</h3>
                   <span className="text-[10px] font-mono text-maroon tracking-widest uppercase font-bold">Chief Executive Officer</span>
                   <p className="text-[11px] text-slate-500 font-medium mt-0.5">Safe Core Surgical Co.</p>
                 </div>

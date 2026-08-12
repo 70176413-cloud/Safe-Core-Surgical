@@ -28,7 +28,8 @@ export const SURGICAL_INSTRUMENTS: SurgicalInstrument[] = [
       "Micro-structured safety ridges block sliding",
       "Highly resistant to thermal wear and oxidation"
     ],
-    iconName: "Scissors"
+    iconName: "Scissors",
+    imageUrl: "/src/assets/images/surgical_instrument_1.jpg"
   },
   {
     id: "gs-202",
@@ -49,7 +50,8 @@ export const SURGICAL_INSTRUMENTS: SurgicalInstrument[] = [
       "Micro-aligned hinge avoids rotational blade deflection",
       "Hand-calibrated scissor tension for consistent pressure"
     ],
-    iconName: "Scissors"
+    iconName: "Scissors",
+    imageUrl: "/src/assets/images/surgical_instrument_3.jpg"
   },
   {
     id: "gs-203",
@@ -70,7 +72,8 @@ export const SURGICAL_INSTRUMENTS: SurgicalInstrument[] = [
       "Micro-bevel blade structure avoids tissue slippage of soft vessels",
       "Optimized spring rate on shear action"
     ],
-    iconName: "Scissors"
+    iconName: "Scissors",
+    imageUrl: "/src/assets/images/surgical_instrument_5.jpg"
   },
   {
     id: "gs-204",
@@ -91,7 +94,8 @@ export const SURGICAL_INSTRUMENTS: SurgicalInstrument[] = [
       "Perfect spring-back resilience calibrated at exactly 1.0 Newton",
       "Non-magnetic composition for safe active cauterization spaces"
     ],
-    iconName: "Compass"
+    iconName: "Compass",
+    imageUrl: "/src/assets/images/surgical_instrument_2.jpg"
   },
   {
     id: "gs-205",
@@ -112,15 +116,16 @@ export const SURGICAL_INSTRUMENTS: SurgicalInstrument[] = [
       "Atraumatic teeth density reduces vessel shear pressure",
       "Slim-bored shanks provide high flex feedback"
     ],
-    iconName: "Wrench"
+    iconName: "Wrench",
+    imageUrl: "/src/assets/images/surgical_instrument_6.jpg"
   },
   {
     id: "gs-206",
-    name: "Mayo-Hegar High-Precision Needle Holder",
+    name: "Mayo-Hegar High-Precision Needle Holder (Gold Plated Handle)",
     category: SurgicalCategory.GENERAL,
     sku: "SC-GS-206-NH",
-    material: "Diamond-Pattern Tungsten Carbide Silver-Soldered Jaws",
-    description: "Heavy-duty needle driver with cross-serrated diamond pyramids for solid locking of wire and monofilament surgical needles.",
+    material: "Gold-Plated Handles with Diamond-Pattern Tungsten Carbide Jaws",
+    description: "Heavy-duty needle driver featuring ergonomic gold-plated finger loops and cross-serrated tungsten carbide jaws for non-slip holding of surgical needles.",
     approxPrice: 320,
     specs: [
       "Total Length: 160mm",
@@ -129,11 +134,13 @@ export const SURGICAL_INSTRUMENTS: SurgicalInstrument[] = [
       "Suture compatibility: 2-0 to 6-0 suture wires"
     ],
     features: [
+      "Gold-plated ring handles denote tungsten carbide jaw inserts",
       "Tungsten inserts offer unmatched longevity and wear resistance",
       "Beveled joint hinges prevent suture catching and snarls",
       "Balanced grip weight distributes pressure over palm tissue"
     ],
-    iconName: "ShieldCheck"
+    iconName: "ShieldCheck",
+    imageUrl: "/src/assets/images/surgical_instrument_4.jpg"
   },
 
   // ==========================================

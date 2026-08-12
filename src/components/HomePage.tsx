@@ -86,15 +86,15 @@ export const HomePage: React.FC<HomePageProps> = ({
       
       {/* 1. HERO SECTION */}
       <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden border-b border-slate-200 bg-slate-50">
-        {/* Background Image with Crisp Interactive Light Overlay */}
+        {/* Background Image - Full Edge-to-Edge Cover */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/src/assets/images/surgical_hero_bg_1785495766624.jpg" 
-            alt="Surgical Operating Suite & Steel Instrumentation" 
+            src="/src/assets/images/hero_surgical_tools_bg.jpg" 
+            alt="Surgical Tools & Sterilization Equipment" 
             referrerPolicy="no-referrer"
-            className="w-full h-full object-cover opacity-25 scale-105 transition-transform duration-1000 hover:scale-100"
+            className="w-full h-full object-cover opacity-85 scale-100"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/85 via-slate-50/90 to-slate-100/95"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-white/55 to-slate-100/80 backdrop-contrast-105"></div>
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 sm:px-10 py-20 text-center">
@@ -197,14 +197,14 @@ export const HomePage: React.FC<HomePageProps> = ({
               <div className="relative rounded overflow-hidden border border-slate-200 shadow-xl group bg-white">
                 <img 
                   src="/src/assets/images/ceo_abdul_ul_rehman.jpg" 
-                  alt="Chief Executive Officer Abdul Ul Rehman" 
+                  alt="Chief Executive Officer Abdul Rehman" 
                   referrerPolicy="no-referrer"
                   className="w-full h-[500px] object-cover object-top group-hover:scale-105 transition-transform duration-700"
                 />
                 
                 {/* Badge Overlay */}
                 <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/95 backdrop-blur-md border border-slate-200 rounded shadow-lg">
-                  <span className="editorial-serif block text-slate-900 font-bold text-lg">Abdul Ul Rehman</span>
+                  <span className="editorial-serif block text-slate-900 font-bold text-lg">Abdul Rehman</span>
                   <span className="text-[10px] font-mono text-maroon tracking-widest uppercase font-bold">Chief Executive Officer</span>
                   <p className="text-[11px] text-slate-600 mt-1 font-normal">Safe Core Surgical Co. Global Manufacturing</p>
                 </div>
@@ -464,12 +464,26 @@ export const HomePage: React.FC<HomePageProps> = ({
                 className="bg-white border border-slate-200 hover:border-maroon/50 rounded p-6 flex flex-col justify-between group transition-all shadow-xs hover:shadow-md"
               >
                 <div>
+                  {inst.imageUrl && (
+                    <div 
+                      onClick={() => setActiveTab("products")}
+                      className="w-full h-48 mb-4 rounded overflow-hidden border border-slate-200 bg-slate-50 cursor-pointer group-hover:border-maroon/40 transition-colors p-2 flex items-center justify-center"
+                    >
+                      <img 
+                        src={inst.imageUrl} 
+                        alt={inst.name} 
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                  )}
+
                   <div className="flex justify-between items-start mb-4">
                     <span className="text-[10px] font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2 py-1 rounded font-semibold">
                       {inst.sku}
                     </span>
-                    <span className="text-xs font-bold text-maroon font-mono">
-                      ${inst.approxPrice} USD
+                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                      FACTORY DIRECT B2B
                     </span>
                   </div>
 

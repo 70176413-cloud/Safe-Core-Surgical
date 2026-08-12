@@ -32,6 +32,7 @@ export interface SurgicalInstrument {
   specs: string[];
   features: string[];
   iconName: string;
+  imageUrl?: string;
 }
 
 export interface QuoteItem {

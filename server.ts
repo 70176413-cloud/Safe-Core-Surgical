@@ -37,11 +37,13 @@ async function startServer() {
   // API Route: Send Sourcing Inquiry Email
   app.post("/api/send-inquiry", async (req, res) => {
     try {
-      const { fullName, organization, email, phone, tier, notes, items, totalEstimated, refId, date } = req.body;
+      const { fullName, organization, email, phone, tier, notes, items, refId, date } = req.body;
 
       if (!fullName || !organization || !email || !items || items.length === 0) {
         return res.status(400).json({ error: "Required customer details or items are missing." });
       }
+
+      const totalUnits = (items as QuoteItem[]).reduce((sum, item) => sum + item.quantity, 0);
 
       // 1. Build beautiful HTML email content
       const itemsHtml = (items as QuoteItem[]).map((item) => `
@@ -51,8 +53,7 @@ async function startServer() {
             <strong style="color: #18181b;">${item.instrument.name}</strong><br />
             <span style="font-size: 11px; color: #71717a;">${item.instrument.category} | ${item.instrument.material}</span>
           </td>
-          <td style="padding: 12px 8px; text-align: center; font-weight: bold; color: #18181b;">${item.quantity}</td>
-          <td style="padding: 12px 8px; text-align: right; font-weight: bold; color: #8b0000;">$${(item.instrument.approxPrice * item.quantity).toLocaleString()} USD</td>
+          <td style="padding: 12px 8px; text-align: right; font-weight: bold; color: #8b0000;">${item.quantity} units</td>
         </tr>
       `).join("");
 
@@ -117,10 +118,9 @@ async function startServer() {
                       <table width="100%" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse; font-size: 13px; line-height: 1.5; color: #27272a;">
                         <thead>
                           <tr style="border-bottom: 2px solid #e4e4e7; font-size: 11px; font-weight: bold; color: #71717a; text-transform: uppercase;">
-                            <th width="20%" style="padding-bottom: 8px; text-align: left;">SKU</th>
-                            <th width="50%" style="padding-bottom: 8px; text-align: left;">Instrument / Specs</th>
-                            <th width="10%" style="padding-bottom: 8px; text-align: center;">Qty</th>
-                            <th width="20%" style="padding-bottom: 8px; text-align: right;">Est. Range</th>
+                            <th width="25%" style="padding-bottom: 8px; text-align: left;">SKU</th>
+                            <th width="55%" style="padding-bottom: 8px; text-align: left;">Instrument / Specs</th>
+                            <th width="20%" style="padding-bottom: 8px; text-align: right;">Quantity</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -132,9 +132,9 @@ async function startServer() {
                               <strong>STERILIZATION INTEGRITY</strong><br />
                               <span style="color: #15803d; font-weight: bold;">✓ APPROVED MOIST-HEAT AUTOCLAVE OK (134°C)</span>
                             </td>
-                            <td colspan="2" style="padding: 24px 0 0 0; text-align: right; vertical-align: top;">
-                              <span style="font-size: 10px; color: #71717a; text-transform: uppercase; display: block; margin-bottom: 2px;">Estimated Portfolio Value</span>
-                              <span style="font-size: 20px; font-weight: 850; color: #8b0000; letter-spacing: -0.02em;">$${totalEstimated.toLocaleString()} USD</span>
+                            <td style="padding: 24px 0 0 0; text-align: right; vertical-align: top;">
+                              <span style="font-size: 10px; color: #71717a; text-transform: uppercase; display: block; margin-bottom: 2px;">Total Units</span>
+                              <span style="font-size: 20px; font-weight: 850; color: #8b0000; letter-spacing: -0.02em;">${totalUnits} Units</span>
                             </td>
                           </tr>
                         </tfoot>

@@ -45,6 +45,17 @@ export const InstrumentModal: React.FC<InstrumentModalProps> = ({
 
         {/* Body */}
         <div className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+          {instrument.imageUrl && (
+            <div className="w-full h-80 rounded overflow-hidden border border-slate-200 bg-slate-50 p-2 shadow-inner flex items-center justify-center">
+              <img 
+                src={instrument.imageUrl} 
+                alt={instrument.name} 
+                referrerPolicy="no-referrer"
+                className="w-full h-full object-contain"
+              />
+            </div>
+          )}
+
           <p className="text-xs text-slate-600 font-normal leading-relaxed">
             {instrument.description}
           </p>
@@ -83,8 +94,8 @@ export const InstrumentModal: React.FC<InstrumentModalProps> = ({
         {/* Footer */}
         <div className="p-6 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
           <div>
-            <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">ESTIMATED PRICE RANGE</span>
-            <span className="editorial-serif text-2xl text-maroon font-bold">${instrument.approxPrice} USD</span>
+            <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">MANUFACTURING GRADE</span>
+            <span className="editorial-serif text-lg text-emerald-800 font-bold">ISO 13485 • B2B Direct</span>
           </div>
 
           <button

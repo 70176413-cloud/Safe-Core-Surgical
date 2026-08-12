@@ -46,7 +46,7 @@ export const QuoteDrawer: React.FC<QuoteDrawerProps> = ({
   const [submittedRef, setSubmittedRef] = useState<SubmittedQuoteRef | null>(null);
   const [testUrl, setTestUrl] = useState("");
 
-  const totalEstimated = items.reduce((sum, item) => sum + (item.instrument.approxPrice * item.quantity), 0);
+  const totalUnits = items.reduce((sum, item) => sum + item.quantity, 0);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -68,7 +68,7 @@ export const QuoteDrawer: React.FC<QuoteDrawerProps> = ({
           tier: form.tier,
           notes: form.notes,
           items,
-          totalEstimated,
+          totalUnits,
           refId,
           date: dateStr
         })
@@ -168,16 +168,16 @@ export const QuoteDrawer: React.FC<QuoteDrawerProps> = ({
                     <div key={item.instrument.id} className="flex justify-between py-1 border-b border-slate-200/60">
                       <div>
                         <span className="text-slate-900 font-bold">{item.instrument.sku}</span> - {item.instrument.name}
-                        <span className="text-slate-500 block text-[10px]">Qty: {item.quantity}</span>
+                        <span className="text-slate-500 block text-[10px]">Category: {item.instrument.category}</span>
                       </div>
-                      <span className="text-maroon font-bold">${(item.instrument.approxPrice * item.quantity).toLocaleString()} USD</span>
+                      <span className="text-maroon font-bold">Qty: {item.quantity}</span>
                     </div>
                   ))}
                 </div>
 
                 <div className="pt-3 border-t border-slate-200 flex justify-between text-sm font-bold">
-                  <span>TOTAL ESTIMATE:</span>
-                  <span className="text-maroon">${submittedRef.items.reduce((s, i) => s + (i.instrument.approxPrice * i.quantity), 0).toLocaleString()} USD</span>
+                  <span>TOTAL ITEMS REQUISITIONED:</span>
+                  <span className="text-maroon">{submittedRef.items.reduce((s, i) => s + i.quantity, 0)} Units</span>
                 </div>
               </div>
 
@@ -230,7 +230,7 @@ export const QuoteDrawer: React.FC<QuoteDrawerProps> = ({
                         <div className="flex-1">
                           <span className="text-[10px] font-mono text-slate-500 block font-semibold">{item.instrument.sku}</span>
                           <h4 className="editorial-serif text-sm text-slate-900 font-bold">{item.instrument.name}</h4>
-                          <span className="text-[10px] font-mono text-maroon font-bold">${item.instrument.approxPrice} USD / unit</span>
+                          <span className="text-[10px] font-mono text-emerald-700 font-bold">Category: {item.instrument.category}</span>
                         </div>
 
                         <div className="flex items-center space-x-2">
@@ -344,8 +344,8 @@ export const QuoteDrawer: React.FC<QuoteDrawerProps> = ({
                   {/* Summary Footer */}
                   <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">ESTIMATED PORTFOLIO</span>
-                      <span className="editorial-serif text-xl font-bold text-maroon">${totalEstimated.toLocaleString()} USD</span>
+                      <span className="text-[10px] font-mono text-slate-500 uppercase block font-semibold">TOTAL REQUISITION UNITS</span>
+                      <span className="editorial-serif text-xl font-bold text-maroon">{totalUnits} Units</span>
                     </div>
 
                     <button

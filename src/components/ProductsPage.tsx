@@ -63,8 +63,6 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
     }).sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name);
       if (sortBy === "sku") return a.sku.localeCompare(b.sku);
-      if (sortBy === "price-low") return a.approxPrice - b.approxPrice;
-      if (sortBy === "price-high") return b.approxPrice - a.approxPrice;
       return 0;
     });
   }, [selectedCategory, materialFilter, searchQuery, sortBy]);
@@ -180,8 +178,6 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
               >
                 <option value="name">Name (A-Z)</option>
                 <option value="sku">SKU Code</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
               </select>
             </div>
 
@@ -229,13 +225,25 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
                   className="bg-white border border-slate-200 hover:border-maroon/60 rounded p-6 flex flex-col justify-between group transition-all duration-300 shadow-xs hover:shadow-md hover:-translate-y-1"
                 >
                   <div>
+                    {/* Card Header Image if available */}
+                    {inst.imageUrl && (
+                      <div 
+                        onClick={() => onOpenInstrumentModal(inst)}
+                        className="w-full h-48 mb-4 rounded overflow-hidden border border-slate-200 bg-slate-50 cursor-pointer group-hover:border-maroon/40 transition-colors p-2 flex items-center justify-center"
+                      >
+                        <img 
+                          src={inst.imageUrl} 
+                          alt={inst.name} 
+                          referrerPolicy="no-referrer"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                    )}
+
                     {/* Card Header */}
                     <div className="flex items-start justify-between mb-4">
                       <span className="text-[10px] font-mono text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded font-semibold">
                         {inst.sku}
-                      </span>
-                      <span className="text-xs font-bold text-maroon font-mono">
-                        ${inst.approxPrice} USD
                       </span>
                     </div>
 
@@ -331,13 +339,10 @@ export const ProductsPage: React.FC<ProductsPageProps> = ({
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-6 shrink-0">
-                    <span className="text-sm font-bold font-mono text-maroon">
-                      ${inst.approxPrice} USD
-                    </span>
+                  <div className="flex items-center space-x-3 shrink-0">
                     <button
                       onClick={() => onOpenInstrumentModal(inst)}
-                      className="p-2 bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 rounded"
+                      className="p-2 bg-slate-100 border border-slate-200 text-slate-700 hover:text-slate-900 rounded cursor-pointer"
                     >
                       <Eye className="w-4 h-4" />
                     </button>
